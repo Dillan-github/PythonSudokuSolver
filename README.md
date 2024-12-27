@@ -1,9 +1,9 @@
 # Python Sudoku Solver
 Initial commit ReadMe
 
-src/solver.py will take in two command line arguments:
-1. the method to use to solve (1,2,3,4,5)
-2. the path to the text file containing the unsolved puzzle
+src/solver.py will take in the filename as the only command line argument:
+1. the path to the text file containing the unsolved puzzle
+
 
 The text file containing the unsolved puzzle should be in the following format:
 
@@ -23,3 +23,5 @@ The text file containing the unsolved puzzle should be in the following format:
 Example of execution from root directory:
 
 ```python3 src/solver.py 1 test1.txt```
+
+This solves simple puzzles.

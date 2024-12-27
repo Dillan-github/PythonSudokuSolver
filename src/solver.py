@@ -1,9 +1,8 @@
 import sys
 from pprint import pprint
 # read in command line arguments
-#method = sys.argv[1]
-#filename = sys.argv[2]
-filename = "tests/test1.txt"
+#filename = sys.argv[1]
+filename = "tests/test2.txt"
 N = 9
 # print("method: {}, filename: {}".format(method, filename))
 
@@ -59,11 +58,27 @@ for i in range(N):
         else:
             possible[i][j] = [-1]
 
+def isUnique(r,row):
+    # given a list of lists, find the unique value
+    pos_count = 0
+    for row_value in row:
+        for pos_value in row_value:
+            if pos_value == r:
+                pos_count += 1
+                if pos_count > 1:
+                    return False
+    return True
 
-solved = False
+def stuckFix():
+    for possible_counter in range(2,N):
+        for pi in range(N):
+            for pj in range(N):
+                if len(possible[pi][pj]) == possible_counter:
+                    # just choose one
+                    possible[pi][pj] = [possible[pi][pj][0]]
+                    return
 
-# print(whichQuadrant(5,1))
-count = 0
+stuck_counter = 0
 while not isSolved(puzzle):
     # loop through the puzzle
     for i in range(N):
@@ -73,10 +88,15 @@ while not isSolved(puzzle):
             
             # check row
             row = puzzle[i]
-            
+
             for r in row:
                 if r in temp:
                     temp.remove(r)
+            
+            temp_row = possible[i]
+            for temp_value in temp:
+                if isUnique(temp_value,temp_row):
+                    temp = [temp_value]
             
             # check col
             col = [0]*N
@@ -87,19 +107,54 @@ while not isSolved(puzzle):
                 if c in temp:
                     temp.remove(c)
             
+            temp_col = [0]*N
+            for tc in range(N):
+                temp_col[tc] = possible[tc][j]
+            
+            for temp_value in temp:
+                if isUnique(temp_value,temp_col):
+                    temp = [temp_value]
+            
             # check quadrant
             quad = getQuadrant(whichQuadrant(i,j),puzzle)
             for q in quad:
                 if q in temp:
                     temp.remove(q)
             
+            temp_quad = getQuadrant(whichQuadrant(i,j),possible)
+            for temp_value in temp:
+                if isUnique(temp_value,temp_quad):
+                    temp = [temp_value]
+
             possible[i][j] = temp
-                   
+            
+            # check possible array for a puzzle update
             for x in range(N):
                 for y in range(N):
                     if len(possible[x][y]) == 1 and possible[x][y][0] != -1:
                         puzzle[x][y] = possible[x][y][0]
                         possible[x][y][0] = -1
+                        stuck_counter = 0
+    if stuck_counter > N:
+        print("Stuck")
+        #stuckFix()
+        stuck_counter = 0
+        exit(0)
 
-print("Puzzle:")
-pprint(puzzle)
+            
+        #exit(0)
+            
+    stuck_counter += 1
+
+
+# write answer to new file
+answer_filename = "output/"+"".join(filename.split("/")[1].split(".")[:-1]) + "_answer.txt"
+print("Solution saved in {}".format(answer_filename))
+new_file = open(answer_filename, "w")
+for r in puzzle:
+    for c in r:
+        new_file.write(str(c))
+        if c != r[N-1]:
+            new_file.write(", ")
+    new_file.write("\n")
+new_file.close()
